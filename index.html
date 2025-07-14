@@ -92,6 +92,7 @@
   <script>
     const sheetID = "1bq1d1JsNjUTPjZmAGAGe8a8M8kPeS4dKA0ZW1ucL9fc";
     const sheetName = "المنيو";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyfrKxq7PhEzkg_sFRC91laOdteZKm9GYwOZqz7XF7AxPmKNQA-sfooRLFhFvvTcs80/exec";
     const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?sheet=${sheetName}`;
     const menuBody = document.getElementById("menuBody");
     let menuData = [];
@@ -142,7 +143,24 @@
     }
 
     function saveMenu() {
-      alert("🚧 سيتم تنفيذ الحفظ إلى Google Sheets لاحقًا عبر Google Apps Script.");
+      const updatedRows = Array.from(menuBody.children).map(row => {
+        const inputs = row.querySelectorAll("input");
+        return {
+          category: inputs[0].value,
+          name: inputs[1].value,
+          price: inputs[2].value,
+          desc: inputs[3].value,
+          img: inputs[4].value
+        };
+      });
+
+      fetch(scriptURL, {
+        method: "POST",
+        body: JSON.stringify({ menu: updatedRows })
+      })
+      .then(res => res.text())
+      .then(msg => alert("✅ تم حفظ التعديلات بنجاح"))
+      .catch(err => alert("❌ حدث خطأ أثناء الحفظ"));
     }
 
     fetchMenu();
