@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تعديل المنيو</title>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: #f9f9f9;
+      padding: 20px;
+      text-align: center;
+    }
+    h2 {
+      color: #333;
+    }
+    .menu-table {
+      width: 100%;
+      max-width: 1000px;
+      margin: 30px auto;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .menu-table th, .menu-table td {
+      padding: 12px;
+      border: 1px solid #ddd;
+    }
+    .menu-table th {
+      background-color: #2e7d32;
+      color: white;
+    }
+    .menu-table input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-family: 'Cairo', sans-serif;
+    }
+    .actions button {
+      padding: 6px 10px;
+      margin: 3px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .add-btn {
+      background-color: #2e7d32;
+      color: white;
+    }
+    .delete-btn {
+      background-color: #c62828;
+      color: white;
+    }
+    .save-btn {
+      background-color: #1976d2;
+      color: white;
+      margin-top: 20px;
+    }
+    .add-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>صفحة تعديل المنيو</h2>
+
+  <table class="menu-table" id="menuTable">
+    <thead>
+      <tr>
+        <th>القسم</th>
+        <th>اسم الصنف</th>
+        <th>السعر</th>
+        <th>الوصف</th>
+        <th>الصورة</th>
+        <th>إجراءات</th>
+      </tr>
+    </thead>
+    <tbody id="menuBody">
+      <!-- البيانات ستظهر هنا -->
+    </tbody>
+  </table>
+
+  <div class="add-container">
+    <button class="add-btn" onclick="addNewRow()">➕ إضافة صنف جديد</button>
+    <button class="save-btn" onclick="saveMenu()">💾 حفظ التعديلات</button>
+  </div>
+
+  <script>
+    const sheetID = "1bq1d1JsNjUTPjZmAGAGe8a8M8kPeS4dKA0ZW1ucL9fc";
+    const sheetName = "المنيو";
+    const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?sheet=${sheetName}`;
+    const menuBody = document.getElementById("menuBody");
+    let menuData = [];
+
+    function fetchMenu() {
+      fetch(url)
+        .then(res => res.text())
+        .then(text => {
+          const json = JSON.parse(text.substr(47).slice(0, -2));
+          const rows = json.table.rows;
+          menuData = rows.map(r => ({
+            category: r.c[0]?.v || "",
+            name: r.c[1]?.v || "",
+            price: r.c[2]?.v || "",
+            desc: r.c[3]?.v || "",
+            img: r.c[4]?.v || ""
+          }));
+          renderMenu();
+        });
+    }
+
+    function renderMenu() {
+      menuBody.innerHTML = "";
+      menuData.forEach((item, i) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><input type="text" value="${item.category}"></td>
+          <td><input type="text" value="${item.name}"></td>
+          <td><input type="number" value="${item.price}"></td>
+          <td><input type="text" value="${item.desc}"></td>
+          <td><input type="text" value="${item.img}"></td>
+          <td class="actions">
+            <button class="delete-btn" onclick="deleteRow(${i})">حذف</button>
+          </td>
+        `;
+        menuBody.appendChild(row);
+      });
+    }
+
+    function deleteRow(index) {
+      menuData.splice(index, 1);
+      renderMenu();
+    }
+
+    function addNewRow() {
+      menuData.push({ category: "", name: "", price: "", desc: "", img: "" });
+      renderMenu();
+    }
+
+    function saveMenu() {
+      alert("🚧 سيتم تنفيذ الحفظ إلى Google Sheets لاحقًا عبر Google Apps Script.");
+    }
+
+    fetchMenu();
+  </script>
+</body>
+</html>
