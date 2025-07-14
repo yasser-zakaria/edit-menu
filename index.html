@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>تعديل المنيو</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <style>
     body {
       font-family: 'Cairo', sans-serif;
@@ -40,6 +41,9 @@
       border-radius: 6px;
       font-family: 'Cairo', sans-serif;
       box-sizing: border-box;
+    }
+    .menu-table input[type="file"] {
+      padding: 0;
     }
     .actions button {
       padding: 6px 10px;
@@ -125,13 +129,34 @@
           <td><input type="text" value="${item.name}"></td>
           <td><input type="number" value="${item.price}"></td>
           <td><input type="text" value="${item.desc}"></td>
-          <td><input type="text" value="${item.img}"></td>
+          <td>
+            <input type="text" value="${item.img}" placeholder="رابط الصورة">
+            <input type="file" accept="image/*" onchange="uploadImage(this)">
+          </td>
           <td class="actions">
             <button class="delete-btn" onclick="deleteRow(${i})">حذف</button>
           </td>
         `;
         menuBody.appendChild(row);
       });
+    }
+
+    function uploadImage(input) {
+      const file = input.files[0];
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "ml_default"); // Cloudinary preset
+
+      fetch("https://api.cloudinary.com/v1_1/demo/image/upload", {
+        method: "POST",
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        const url = data.secure_url;
+        input.previousElementSibling.value = url;
+      })
+      .catch(() => alert("حدث خطأ أثناء رفع الصورة"));
     }
 
     function deleteRow(index) {
@@ -146,7 +171,7 @@
 
     function saveMenu() {
       const updatedRows = Array.from(menuBody.children).map(row => {
-        const inputs = row.querySelectorAll("input");
+        const inputs = row.querySelectorAll("input[type='text'], input[type='number']");
         return {
           category: inputs[0].value,
           name: inputs[1].value,
