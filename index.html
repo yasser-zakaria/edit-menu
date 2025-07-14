@@ -145,9 +145,9 @@
       const file = input.files[0];
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("upload_preset", "ml_default"); // Cloudinary preset
+      formData.append("upload_preset", "menu_upload");
 
-      fetch("https://api.cloudinary.com/v1_1/demo/image/upload", {
+      fetch("https://api.cloudinary.com/v1_1/dsahh7m1o/image/upload", {
         method: "POST",
         body: formData
       })
