@@ -44,7 +44,7 @@
     }
     textarea {
       resize: vertical;
-      min-height: 60px;
+      min-height: 100px;
       font-size: 14px;
     }
     .menu-table input[type="file"] {
@@ -133,7 +133,7 @@
           <td><input type="text" value="${item.category}"></td>
           <td><input type="text" value="${item.name}"></td>
           <td><input type="number" value="${item.price}"></td>
-          <td><textarea rows="3">${item.desc}</textarea></td>
+          <td><textarea>${item.desc}</textarea></td>
           <td>
             <input type="text" value="${item.img}" placeholder="رابط الصورة">
             <input type="file" accept="image/*" onchange="uploadImage(this)">
