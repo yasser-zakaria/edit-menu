@@ -34,18 +34,13 @@
       background-color: #2e7d32;
       color: white;
     }
-    .menu-table input, .menu-table textarea {
+    .menu-table input {
       width: 100%;
       padding: 8px;
       border: 1px solid #ccc;
       border-radius: 6px;
       font-family: 'Cairo', sans-serif;
       box-sizing: border-box;
-    }
-    textarea {
-      resize: vertical;
-      min-height: 100px;
-      font-size: 14px;
     }
     .menu-table input[type="file"] {
       padding: 0;
@@ -74,6 +69,39 @@
       text-align: center;
       margin-top: 20px;
     }
+    #descModal {
+      position: fixed;
+      top: 0; right: 0; bottom: 0; left: 0;
+      background-color: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    #descModalContent {
+      background-color: white;
+      padding: 20px;
+      border-radius: 12px;
+      width: 80%;
+      max-width: 600px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    #descModalContent textarea {
+      width: 100%;
+      height: 200px;
+      padding: 10px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: vertical;
+    }
+    .modal-buttons {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
   </style>
 </head>
 <body>
@@ -90,14 +118,23 @@
         <th>إجراءات</th>
       </tr>
     </thead>
-    <tbody id="menuBody">
-      <!-- البيانات ستظهر هنا -->
-    </tbody>
+    <tbody id="menuBody"></tbody>
   </table>
 
   <div class="add-container">
     <button class="add-btn" onclick="addNewRow()">➕ إضافة صنف جديد</button>
     <button class="save-btn" onclick="saveMenu()">💾 حفظ التعديلات</button>
+  </div>
+
+  <div id="descModal">
+    <div id="descModalContent">
+      <h3>📝 تعديل الوصف</h3>
+      <textarea id="modalTextarea"></textarea>
+      <div class="modal-buttons">
+        <button onclick="saveDescription()">✅ حفظ</button>
+        <button onclick="closeModal()">❌ إلغاء</button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -107,6 +144,7 @@
     const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?sheet=${sheetName}`;
     const menuBody = document.getElementById("menuBody");
     let menuData = [];
+    let currentTextarea = null;
 
     function fetchMenu() {
       fetch(url)
@@ -133,7 +171,7 @@
           <td><input type="text" value="${item.category}"></td>
           <td><input type="text" value="${item.name}"></td>
           <td><input type="number" value="${item.price}"></td>
-          <td><textarea>${item.desc}</textarea></td>
+          <td><button onclick="openModal(this)">✏️ تعديل الوصف</button><textarea style="display:none;">${item.desc}</textarea></td>
           <td>
             <input type="text" value="${item.img}" placeholder="رابط الصورة">
             <input type="file" accept="image/*" onchange="uploadImage(this)">
@@ -144,6 +182,23 @@
         `;
         menuBody.appendChild(row);
       });
+    }
+
+    function openModal(button) {
+      currentTextarea = button.nextElementSibling;
+      document.getElementById("modalTextarea").value = currentTextarea.value;
+      document.getElementById("descModal").style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("descModal").style.display = "none";
+    }
+
+    function saveDescription() {
+      if (currentTextarea) {
+        currentTextarea.value = document.getElementById("modalTextarea").value;
+      }
+      closeModal();
     }
 
     function uploadImage(input) {
@@ -158,8 +213,7 @@
       })
       .then(res => res.json())
       .then(data => {
-        const url = data.secure_url;
-        input.previousElementSibling.value = url;
+        input.previousElementSibling.value = data.secure_url;
       })
       .catch(() => alert("حدث خطأ أثناء رفع الصورة"));
     }
