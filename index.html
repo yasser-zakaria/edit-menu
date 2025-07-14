@@ -34,13 +34,18 @@
       background-color: #2e7d32;
       color: white;
     }
-    .menu-table input {
+    .menu-table input, .menu-table textarea {
       width: 100%;
       padding: 8px;
       border: 1px solid #ccc;
       border-radius: 6px;
       font-family: 'Cairo', sans-serif;
       box-sizing: border-box;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+      font-size: 14px;
     }
     .menu-table input[type="file"] {
       padding: 0;
@@ -128,7 +133,7 @@
           <td><input type="text" value="${item.category}"></td>
           <td><input type="text" value="${item.name}"></td>
           <td><input type="number" value="${item.price}"></td>
-          <td><input type="text" value="${item.desc}"></td>
+          <td><textarea rows="3">${item.desc}</textarea></td>
           <td>
             <input type="text" value="${item.img}" placeholder="رابط الصورة">
             <input type="file" accept="image/*" onchange="uploadImage(this)">
@@ -171,7 +176,7 @@
 
     function saveMenu() {
       const updatedRows = Array.from(menuBody.children).map(row => {
-        const inputs = row.querySelectorAll("input[type='text'], input[type='number']");
+        const inputs = row.querySelectorAll("input[type='text'], input[type='number'], textarea");
         return {
           category: inputs[0].value,
           name: inputs[1].value,
